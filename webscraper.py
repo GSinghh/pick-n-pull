@@ -49,15 +49,7 @@ class PickNPull:
                 # Re-locate models dropdown after selecting the brand
                 models = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/app-root/div/div/div/app-check-inventory/app-home/div/div/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[2]/select')))
                 models = Select(models)
-                
-                # for model in models.options:
-                #     model_val = model.get_attribute('value')
-                #     if model_val != "0":
-                #         print(f"This is the model_val: {model_val}")
-                        
-                #         print(f"This is the model name: {model.text}")
-            
-            
+        print(self.makes)
             
             
            
