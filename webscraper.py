@@ -28,29 +28,34 @@ class PickNPull:
     # This function will grab each brand and value from the drop down
     # Stores them in the makes dictionary
     def get_makes_and_models(self):
-        #Initializing driver variable and grabbing URL 
+        # Initializing driver variable and grabbing URL 
         driver = self.driver
         driver.get("https://picknpull.com/check-inventory/")
         
         ignored_exceptions = (StaleElementReferenceException, NoSuchElementException)
-        wait = WebDriverWait(driver, 10, ignored_exceptions)
-        # brands = Select(wait.until(EC.visibility_of_element_located(By.XPATH, '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[1]/select'))
-        brands = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[1]/select')))
+        wait = WebDriverWait(driver, 30, ignored_exceptions=ignored_exceptions)
+        
+        brands = driver.find_element(By.XPATH, '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[1]/select')
         brands = Select(brands)
-        for brand in brands.options:
-            # Since there is a placeholder value within the first option of the list
-            # We ignore that with this condition
+        
+        for i in range(1, len(brands.options)):
+            brand = brands.options[i]
             brand_val = brand.get_attribute('value')
-            if brand_val != "0":
-                self.makes[brand.text] = brand_val
-                # Select the brand from dropdown
-                brands.select_by_value(brand_val)
-                
-                # Re-locate models dropdown after selecting the brand
-                models = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/app-root/div/div/div/app-check-inventory/app-home/div/div/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[2]/select')))
-                models = Select(models)
-        print(self.makes)
+            self.makes[brand.text] = brand_val
+            brands.select_by_value(brand_val)
+            # Initial value should not be changed as we are looping over these values
+            # Wait for the models dropdown to be refreshed
             
+            models = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                         '#main-content > div.check_inventory > app-vehicle-search-controls > div > div > div > div:nth-child(1) > div:nth-child(2) > select')))
+            models = Select(models)
+            # for i in range(1, len(models.options)):
+            #     model = models.options[i]
+            #     model_val = model.get_attribute('value')
+            #     models.select_by_value(model_val)
+        # print(self.models)
+        
+        
             
            
         
