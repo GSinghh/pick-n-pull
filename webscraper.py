@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import NoSuchElementException
+import time
 
 class PickNPull:
     def __init__(self, make, model, start_year, end_year, postal_code, distance) -> None:
@@ -25,37 +26,46 @@ class PickNPull:
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     
     
-    # This function will grab each brand and value from the drop down
-    # Stores them in the makes dictionary
+    # This function grabs all makes and models from the dropdown menus
+    # Values are stored to be used later to generate URL 
+    
     def get_makes_and_models(self):
-        # Initializing driver variable and grabbing URL 
+        # Initializing webdriver
         driver = self.driver
         driver.get("https://picknpull.com/check-inventory/")
         
-        ignored_exceptions = (StaleElementReferenceException, NoSuchElementException)
-        wait = WebDriverWait(driver, 30, ignored_exceptions=ignored_exceptions)
+        ignored_exception = (StaleElementReferenceException, NoSuchElementException)
+        wait = WebDriverWait(driver, 50, ignored_exceptions=ignored_exception)
         
-        brands = driver.find_element(By.XPATH, '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[1]/select')
+        brands_location = '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[1]/select'
+        models_location = '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[2]/select'
+        
+        brands = driver.find_element(By.XPATH, brands_location)
         brands = Select(brands)
         
-        for i in range(1, len(brands.options)):
+        for i in range(1, 5):
+            brands.select_by_index(i)
+            time.sleep(.5)
+            # Grabbing all models for that brand
+            models = driver.find_element(By.XPATH, models_location)
+            models_select = Select(models)
+            for j in range(1, len(models_select.options)):
+                model = models_select.options[j].text
+                print(model)
+                
+                
             brand = brands.options[i]
             brand_val = brand.get_attribute('value')
             self.makes[brand.text] = brand_val
-            brands.select_by_value(brand_val)
-            # Initial value should not be changed as we are looping over these values
-            # Wait for the models dropdown to be refreshed
             
-            models = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
-                                         '#main-content > div.check_inventory > app-vehicle-search-controls > div > div > div > div:nth-child(1) > div:nth-child(2) > select')))
-            models = Select(models)
-            # for i in range(1, len(models.options)):
-            #     model = models.options[i]
-            #     model_val = model.get_attribute('value')
-            #     models.select_by_value(model_val)
-        # print(self.models)
+            
+        driver.quit()
         
-        
+    def store_models(self, models):
+        for i in range(1, len(models.options) + 1):
+            model = models.options[i]
+            model_val = model.get_attribute('value')
+            self.models[model] = model_val
             
            
         
