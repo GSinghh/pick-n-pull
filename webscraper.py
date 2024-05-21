@@ -16,6 +16,8 @@ class PickNPull:
         self.end_year = end_year
         self.postal_code = postal_code
         self.distance = distance
+        self.make = make.upper()
+        self.model = model.upper()
         self.models = {}
         self.makes = {}
         
@@ -43,23 +45,34 @@ class PickNPull:
         brands = driver.find_element(By.XPATH, brands_location)
         brands = Select(brands)
         
-        for i in range(1, 5):
+        for i in range(1, len(brands.options)):
             brands.select_by_index(i)
             time.sleep(.5)
             # Grabbing all models for that brand
             models = driver.find_element(By.XPATH, models_location)
             models_select = Select(models)
             for j in range(1, len(models_select.options)):
-                model = models_select.options[j].text
-                print(model)
+                model = models_select.options[j]
+                print(model.text)
+                model_val = model.get_attribute('value')
+                self.models[model.text] = model_val
                 
                 
             brand = brands.options[i]
             brand_val = brand.get_attribute('value')
             self.makes[brand.text] = brand_val
             
-            
+        # print(self.models)
         driver.quit()
+        
+    def URL_builder(self):
+        # This function will generate a URL that 
+        if self.make not in self.makes:
+            return "Vehicle Not Found"
+        if self.model not in self.models:
+            return "Brand Not Found"
+        
+        return f"https://picknpull.com/check-inventory?make={self.makes[self.make]}&model={self.models[self.model]}&distance={self.distance}&zip={self.postal_code}&year="
         
     def store_models(self, models):
         for i in range(1, len(models.options) + 1):
