@@ -13,7 +13,7 @@ import os
 import json
 
 class PickNPull:
-    def __init__(self, make, model, start_year, end_year, postal_code, distance) -> None:
+    def __init__(self, make, model, postal_code, distance, start_year = '', end_year = '') -> None:
         self.start_year = start_year
         self.end_year = end_year
         self.postal_code = postal_code
@@ -75,13 +75,14 @@ class PickNPull:
         driver.quit()
         
     def URL_builder(self):
-        # This function will generate a URL that the driver will use to find the vehicle its looking for 
+        # This function will generate a URL that the driver will use to find the vehicle its looking for
+        
         if self.make not in self.makes:
             return "Vehicle Not Found"
         if self.model not in self.models:
             return "Brand Not Found"
         
-        return f"https://picknpull.com/check-inventory?make={self.makes[self.make]}&model={self.models[self.model]}&distance={self.distance}&zip={self.postal_code}&year="
+        return f"https://picknpull.com/check-inventory?make={self.makes[self.make]}&model={self.models[self.model]}&distance={self.distance}&zip={self.postal_code}&year={self.check_years()}"
             
     def locate_element(self, element_location, wait, attempts = 3):
         for attempt in range(attempts):
@@ -115,6 +116,13 @@ class PickNPull:
         with open(filename) as file:
             return json.load(file)
         
+    def check_years(self):
+        if self.start_year == '' and self.end_year == '':
+            return ''
+        elif self.start_year != '' and self.end_year == '':
+            return self.start_year
+        else:
+            return self.start_year + '-' + self.end_year
         
-test = PickNPull("Acura", "Integra", "94", "01", 94560, 50)
+test = PickNPull("Acura", "Integra", 94560, 50, "94", "01")
 print(test.URL_builder())
