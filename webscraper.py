@@ -27,7 +27,6 @@ class PickNPull:
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         self.get_makes_and_models()
-        self.get_cars()
     
     
     # This function grabs all makes and models from the dropdown menus
@@ -90,19 +89,6 @@ class PickNPull:
             self.makes[brand.text] = brand.get_attribute('value')
         except StaleElementReferenceException:
             print("Error When Storing Brand")
-            
-    def get_cars(self):
-        button_location = '/html/body/app-root/div/div/div/app-check-inventory/app-vehicle-search/div/div/div/div[1]/app-vehicle-search-controls/div/div/div/div[3]/div[2]/input'
-        driver = self.driver
-        website_url = self.URL_builder()
-        print(website_url)
-        driver.get(self.URL_builder())
-        
-        button = driver.find_element(By.XPATH, button_location)
-        button.click()
-        
-        driver.quit()
         
         
 test = PickNPull("Acura", "Integra", "94", "01", 94560, 50)
-print(test.URL_builder())
