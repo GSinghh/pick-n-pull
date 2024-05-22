@@ -9,6 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import NoSuchElementException
 import time
+import os
+import json
 
 class PickNPull:
     def __init__(self, make, model, start_year, end_year, postal_code, distance) -> None:
@@ -18,19 +20,31 @@ class PickNPull:
         self.distance = distance
         self.make = make
         self.model = model
+        
         self.models = {}
         self.makes = {}
+        
         
         options = Options()
         options.add_argument('--headless=new')
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        self.get_makes_and_models()
     
+        if os.path.isfile('makes.json') and os.path.isfile('models.json'):
+            self.models = self.load_data_from_file('models.json')
+            self.makes = self.load_data_from_file('makes.json')
+        else:
+            self.get_makes_and_models()
+
     
-    # This function grabs all makes and models from the dropdown menus
-    # Values are stored to be used later to generate URL 
+    """
+        This function grabs all makes and models from the dropdown menus
+        Values are stored in the dictionary
+        Dictionary is saved into json document so dropdowns will only 
+        Need to be parsed once
+    """
+    
     
     def get_makes_and_models(self):
         # Initializing webdriver
@@ -56,6 +70,8 @@ class PickNPull:
             models_select = self.locate_element(models_location, wait)
             self.store_models(models_select)
 
+            self.store_data_in_file(self.makes, 'makes.json')
+            self.store_data_in_file(self.models, 'models.json')
         driver.quit()
         
     def URL_builder(self):
@@ -64,6 +80,7 @@ class PickNPull:
             return "Vehicle Not Found"
         if self.model not in self.models:
             return "Brand Not Found"
+        
         return f"https://picknpull.com/check-inventory?make={self.makes[self.make]}&model={self.models[self.model]}&distance={self.distance}&zip={self.postal_code}&year="
             
     def locate_element(self, element_location, wait, attempts = 3):
@@ -90,5 +107,14 @@ class PickNPull:
         except StaleElementReferenceException:
             print("Error When Storing Brand")
         
+    def store_data_in_file(self, data, filename):
+        with open(filename, 'w') as file:
+            json.dump(data, file)
+            
+    def load_data_from_file(self, filename):
+        with open(filename) as file:
+            return json.load(file)
+        
         
 test = PickNPull("Acura", "Integra", "94", "01", 94560, 50)
+print(test.URL_builder())
