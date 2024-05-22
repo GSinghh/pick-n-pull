@@ -16,8 +16,8 @@ class PickNPull:
         self.end_year = end_year
         self.postal_code = postal_code
         self.distance = distance
-        self.make = make.upper()
-        self.model = model.upper()
+        self.make = make
+        self.model = model
         self.models = {}
         self.makes = {}
         
@@ -26,6 +26,8 @@ class PickNPull:
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        self.get_makes_and_models()
+        self.get_cars()
     
     
     # This function grabs all makes and models from the dropdown menus
@@ -42,47 +44,65 @@ class PickNPull:
         brands_location = '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[1]/select'
         models_location = '//*[@id="main-content"]/div[1]/app-vehicle-search-controls/div/div/div/div[1]/div[2]/select'
         
-        brands = driver.find_element(By.XPATH, brands_location)
-        brands = Select(brands)
+        brands = self.locate_element(brands_location, wait)
         
         for i in range(1, len(brands.options)):
+            # Iterating through each index in brand dropdown
+            # Allows models to be stored for each brand
             brands.select_by_index(i)
-            time.sleep(.5)
-            # Grabbing all models for that brand
-            models = driver.find_element(By.XPATH, models_location)
-            models_select = Select(models)
-            for j in range(1, len(models_select.options)):
-                model = models_select.options[j]
-                print(model.text)
-                model_val = model.get_attribute('value')
-                self.models[model.text] = model_val
-                
-                
-            brand = brands.options[i]
-            brand_val = brand.get_attribute('value')
-            self.makes[brand.text] = brand_val
+            self.store_brands(brands.options[i])
+            time.sleep(.25)
             
-        # print(self.models)
+            # Grabbing all models for that brand
+            models_select = self.locate_element(models_location, wait)
+            self.store_models(models_select)
+
         driver.quit()
         
     def URL_builder(self):
-        # This function will generate a URL that 
+        # This function will generate a URL that the driver will use to find the vehicle its looking for 
         if self.make not in self.makes:
             return "Vehicle Not Found"
         if self.model not in self.models:
             return "Brand Not Found"
-        
         return f"https://picknpull.com/check-inventory?make={self.makes[self.make]}&model={self.models[self.model]}&distance={self.distance}&zip={self.postal_code}&year="
-        
-    def store_models(self, models):
-        for i in range(1, len(models.options) + 1):
-            model = models.options[i]
-            model_val = model.get_attribute('value')
-            self.models[model] = model_val
             
-           
+    def locate_element(self, element_location, wait, attempts = 3):
+        for attempt in range(attempts):
+            try:
+                element = wait.until(EC.element_to_be_clickable((By.XPATH, element_location)))       
+                element_select = Select(element)
+                return element_select
+            except StaleElementReferenceException:
+                if attempt == 3:
+                    print(f"Element not found after {attempts} attemmpts")
+            
+    def store_models(self, models_select):
+        for j in range(1, len(models_select.options)):
+            model = models_select.options[j]
+            try:
+                self.models[model.text] = model.get_attribute('value')
+            except StaleElementReferenceException:
+                print("Error When Storing Model")
+                
+    def store_brands(self, brand):
+        try:
+            self.makes[brand.text] = brand.get_attribute('value')
+        except StaleElementReferenceException:
+            print("Error When Storing Brand")
+            
+    def get_cars(self):
+        button_location = '/html/body/app-root/div/div/div/app-check-inventory/app-vehicle-search/div/div/div/div[1]/app-vehicle-search-controls/div/div/div/div[3]/div[2]/input'
+        driver = self.driver
+        website_url = self.URL_builder()
+        print(website_url)
+        driver.get(self.URL_builder())
         
+        button = driver.find_element(By.XPATH, button_location)
+        button.click()
+        
+        driver.quit()
         
         
 test = PickNPull("Acura", "Integra", "94", "01", 94560, 50)
-test.get_makes_and_models()
+print(test.URL_builder())
