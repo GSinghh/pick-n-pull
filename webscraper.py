@@ -20,13 +20,12 @@ class PickNPull:
         self.distance = distance
         self.make = make
         self.model = model
-        
         self.models = {}
         self.makes = {}
         
         
         options = Options()
-        options.add_argument('--headless=new')
+        # options.add_argument('--headless=new')
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
@@ -37,6 +36,7 @@ class PickNPull:
         else:
             self.get_makes_and_models()
 
+        self.get_car_information()
     
     """
         This function grabs all makes and models from the dropdown menus
@@ -116,6 +116,7 @@ class PickNPull:
         with open(filename) as file:
             return json.load(file)
         
+        
     def check_years(self):
         if self.start_year == '' and self.end_year == '':
             return ''
@@ -124,5 +125,30 @@ class PickNPull:
         else:
             return self.start_year + '-' + self.end_year
         
+    def get_car_information(self):
+        driver = self.driver
+        driver.get(self.URL_builder())
+        self.remove_modal(driver)
+        
+        
+        search_button_location = '/html/body/app-root/div/div/div/app-check-inventory/app-home/div/div/div[1]/app-vehicle-search-controls/div/div/div/div[3]/div[2]/input'
+        search_button = driver.find_element(By.XPATH, search_button_location)
+        search_button.click()
+        
+        # results_location = '/html/body/app-root/div/div/div/app-check-inventory/app-vehicle-search/div/div/div/div[1]/div[6]/div[2]/span[1]'
+        # car_results = WebDriverWait(driver, 50).until(EC.presence_of_all_elements_located(By.XPATH, results_location))
+        # print(len(car_results))
+            
+              
+        driver.quit()
+        
+    def remove_modal(self, driver):
+        try:
+            modal_button_location = '/html/body/app-root/div/div/div/app-check-inventory/app-home/div/div/div[1]/div[2]/div/div/div[1]/div/div'
+            modal_button = driver.find_element(By.XPATH, modal_button_location)
+            modal_button.click()
+        except NoSuchElementException:
+            print("Modal not found, Skipping step")
+        
 test = PickNPull("Acura", "Integra", 94560, 50, "94", "01")
-print(test.URL_builder())
+# print(test.URL_builder())
