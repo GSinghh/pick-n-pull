@@ -135,12 +135,12 @@ class PickNPull:
         search_button = driver.find_element(By.XPATH, search_button_location)
         search_button.click()
         
-        # results_location = '/html/body/app-root/div/div/div/app-check-inventory/app-vehicle-search/div/div/div/div[1]/div[6]/div[2]/span[1]'
-        # car_results = WebDriverWait(driver, 50).until(EC.presence_of_all_elements_located(By.XPATH, results_location))
-        # print(len(car_results))
+        results_location = '/html/body/app-root/div/div/div/app-check-inventory/app-vehicle-search/div/div/div/div[1]/div[6]/div[2]/span[1]'
+        car_results = WebDriverWait(driver, 50).until(EC.presence_of_all_elements_located((By.XPATH, results_location)))
+        print(len(car_results))
             
               
-        driver.quit()
+        # driver.quit()
         
     def remove_modal(self, driver):
         try:
