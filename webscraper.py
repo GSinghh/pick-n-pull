@@ -140,6 +140,7 @@ class PickNPull:
         print(len(car_results))
             
               
+        
         # driver.quit()
         
     def remove_modal(self, driver):
