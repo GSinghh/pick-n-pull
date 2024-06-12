@@ -25,7 +25,7 @@ class PickNPull:
         
         
         options = Options()
-        # options.add_argument('--headless=new')
+        options.add_argument('--headless=new')
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
@@ -135,9 +135,11 @@ class PickNPull:
         search_button = driver.find_element(By.XPATH, search_button_location)
         search_button.click()
         
-        results_location = '/html/body/app-root/div/div/div/app-check-inventory/app-vehicle-search/div/div/div/div[1]/div[6]/div[2]/span[1]'
+        results_location = '//span[@id="resultsList"]'
         car_results = WebDriverWait(driver, 50).until(EC.presence_of_all_elements_located((By.XPATH, results_location)))
         print(len(car_results))
+        
+        driver.quit()
         
     def remove_modal(self, driver):
         try:
@@ -147,5 +149,5 @@ class PickNPull:
         except NoSuchElementException:
             print("Modal not found, Skipping step")
         
-test = PickNPull("Acura", "Integra", 94560, 50, "94", "01")
+test = PickNPull("Acura", "Integra", 94560, 25, "94", "01")
 # print(test.URL_builder())
