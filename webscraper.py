@@ -22,10 +22,11 @@ class PickNPull:
         self.model = model
         self.models = {}
         self.makes = {}
+        self.allCars = {}
         
         
         options = Options()
-        options.add_argument('--headless=new')
+        # options.add_argument('--headless=new')
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
@@ -137,8 +138,19 @@ class PickNPull:
         
         results_location = '//span[@id="resultsList"]'
         car_results = WebDriverWait(driver, 50).until(EC.presence_of_all_elements_located((By.XPATH, results_location)))
-        print(len(car_results))
         
+        for result in car_results:
+            anchor_tag_location = './/a'
+            location = result.find_element(By.XPATH, anchor_tag_location).text
+            
+            tbody_location = './/tbody'
+            tbody = result.find_element(By.XPATH, tbody_location)
+            rows = tbody.find_elements(By.XPATH, './/tr')
+            
+            for row in rows:
+                model = row.find_element(By.XPATH, './/td[@class="hidden-xs"][2]').text
+                print(f"This is the current model: {model}")
+            
         driver.quit()
         
     def remove_modal(self, driver):
