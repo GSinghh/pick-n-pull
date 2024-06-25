@@ -26,7 +26,7 @@ class PickNPull:
         
         
         options = Options()
-        # options.add_argument('--headless=new')
+        options.add_argument('--headless=new')
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
@@ -142,13 +142,14 @@ class PickNPull:
         for result in car_results:
             anchor_tag_location = './/a'
             location = result.find_element(By.XPATH, anchor_tag_location).text
-            
+            print(f"This is the current location: {location}")
             tbody_location = './/tbody'
             tbody = result.find_element(By.XPATH, tbody_location)
             rows = tbody.find_elements(By.XPATH, './/tr')
             
             for row in rows:
                 model = row.find_element(By.XPATH, './/td[@class="hidden-xs"][2]').text
+                
                 print(f"This is the current model: {model}")
             
         driver.quit()
