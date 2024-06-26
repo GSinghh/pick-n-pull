@@ -146,11 +146,14 @@ class PickNPull:
             tbody_location = './/tbody'
             tbody = result.find_element(By.XPATH, tbody_location)
             rows = tbody.find_elements(By.XPATH, './/tr')
-            
+            tr_number = 1
             for row in rows:
-                model = row.find_element(By.XPATH, './/td[@class="hidden-xs"][2]').text
-                
-                print(f"This is the current model: {model}")
+                year = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[2]').text
+                make = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[3]').text
+                model = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[4]').text
+                row_number = row.find_element(By.XPATH, '//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[1]/td[5]')
+                tr_number += 1
+                print(f"This is the current model: {year + ' ' + make + ' ' + model}")
             
         driver.quit()
         
@@ -163,4 +166,3 @@ class PickNPull:
             print("Modal not found, Skipping step")
         
 test = PickNPull("Acura", "Integra", 94560, 25, "94", "01")
-# print(test.URL_builder())
