@@ -157,7 +157,6 @@ class PickNPull:
                 vehicle = year + ' ' + make + ' ' + model
                 vehicles.append(vehicle)
             self.allCars[location] = vehicles
-            print(self.allCars)
         driver.quit()
         
     def remove_modal(self, driver):
