@@ -154,6 +154,7 @@ class PickNPull:
                 model = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[4]').text
                 row_number = row.find_element(By.XPATH, '//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[1]/td[5]')
                 tr_number += 1
+                image_url = ' '
                 vehicle = year + ' ' + make + ' ' + model
                 vehicles.append(vehicle)
             self.allCars[location] = vehicles
