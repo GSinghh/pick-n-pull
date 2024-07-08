@@ -142,12 +142,11 @@ class PickNPull:
         for result in car_results:
             anchor_tag_location = './/a'
             location = result.find_element(By.XPATH, anchor_tag_location).text
-            # print(f"This is the current location: {location}")
             tbody_location = './/tbody'
             tbody = result.find_element(By.XPATH, tbody_location)
             rows = tbody.find_elements(By.XPATH, './/tr')
             tr_number = 1
-            vehicles = {}
+            vehicles = []
             for row in rows:
                 year = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[2]').text
                 make = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[3]').text
@@ -156,8 +155,12 @@ class PickNPull:
                 image_url = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[1]/img').get_attribute('src')
                 tr_number += 1
                 vehicle = year + ' ' + make + ' ' + model
+                vehicles.append({'Car': vehicle,
+                                 'Row Number': row_number, 
+                                 'Image URL': image_url})
+                
             self.allCars[location] = vehicles
-        
+        print(self.allCars)
         driver.quit()
         
     def remove_modal(self, driver):
