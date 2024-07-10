@@ -160,7 +160,6 @@ class PickNPull:
                                  'Image URL': image_url})
                 
             self.allCars[location] = vehicles
-        print(self.allCars)
         driver.quit()
         
     def remove_modal(self, driver):
