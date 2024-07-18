@@ -142,9 +142,11 @@ class PickNPull:
         for result in car_results:
             anchor_tag_location = './/a'
             location = result.find_element(By.XPATH, anchor_tag_location).text
+            
             tbody_location = './/tbody'
             tbody = result.find_element(By.XPATH, tbody_location)
             rows = tbody.find_elements(By.XPATH, './/tr')
+            
             tr_number = 1
             vehicles = []
             for row in rows:
@@ -153,6 +155,7 @@ class PickNPull:
                 model = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[4]').text
                 row_number = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[5]').text
                 image_url = row.find_element(By.XPATH, f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[1]/img').get_attribute('src')
+                
                 tr_number += 1
                 vehicle = year + ' ' + make + ' ' + model
                 vehicles.append({'Car': vehicle,
@@ -160,6 +163,7 @@ class PickNPull:
                                  'Image URL': image_url})
                 
             self.allCars[location] = vehicles
+        print(self.allCars)
         driver.quit()
         
     def remove_modal(self, driver):
@@ -170,4 +174,4 @@ class PickNPull:
         except NoSuchElementException:
             print("Modal not found, Skipping step")
         
-test = PickNPull("Acura", "Integra", 94560, 25, "94", "01")
+test = PickNPull("Acura", "Integra", 94560, 50, "94", "01")
