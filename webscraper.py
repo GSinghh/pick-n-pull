@@ -152,38 +152,30 @@ class PickNPull:
             tbody = result.find_element(By.XPATH, tbody_location)
             rows = tbody.find_elements(By.XPATH, ".//tr")
 
-            tr_number = 1
             vehicles = []
             for row in rows:
-                year = row.find_element(
-                    By.XPATH,
-                    f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[2]',
-                ).text
-                make = row.find_element(
-                    By.XPATH,
-                    f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[3]',
-                ).text
-                model = row.find_element(
-                    By.XPATH,
-                    f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[4]',
-                ).text
-                row_number = row.find_element(
-                    By.XPATH,
-                    f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[5]',
-                ).text
-                image_url = row.find_element(
-                    By.XPATH,
-                    f'//*[@id="resultsList"]/div[3]/div[1]/div[2]/div[2]/table/tbody/tr[{tr_number}]/td[1]/img',
-                ).get_attribute("src")
+                try:
+                    year = row.find_element(By.XPATH, "./td[2]").text
+                    make = row.find_element(By.XPATH, "./td[3]").text
+                    model = row.find_element(By.XPATH, "./td[4]").text
+                    row_number = row.find_element(By.XPATH, "./td[5]").text
+                    image_url = row.find_element(By.XPATH, "./td[1]/img").get_attribute(
+                        "src"
+                    )
 
-                tr_number += 1
-                vehicle = year + " " + make + " " + model
-                vehicles.append(
-                    {"Car": vehicle, "Row Number": row_number, "Image URL": image_url}
-                )
+                    vehicle = f"{year} {make} {model}"
+                    vehicles.append(
+                        {
+                            "Car": vehicle,
+                            "Row Number": row_number,
+                            "Image URL": image_url,
+                        }
+                    )
+
+                except Exception as e:
+                    print(f"Error processing row: {e}")
 
             self.allCars[location] = vehicles
-        # print(self.allCars)
         driver.quit()
 
     def remove_modal(self, driver):
