@@ -11,6 +11,7 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import os
 import json
+import dotenv
 
 
 class PickNPull:
@@ -28,7 +29,7 @@ class PickNPull:
         self.allCars = {}
 
         options = Options()
-        options.add_argument("--headless=new")
+        # options.add_argument("--headless=new")
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(
@@ -177,6 +178,9 @@ class PickNPull:
 
             self.allCars[location] = vehicles
         driver.quit()
+
+    def identify_change(self):
+        print("Found Change")
 
     def remove_modal(self, driver):
         try:
