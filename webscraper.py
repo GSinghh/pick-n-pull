@@ -41,7 +41,15 @@ class PickNPull:
         else:
             self.get_makes_and_models()
 
-        self.get_car_information()
+        file_name = f"{self.make}_{self.model}.json"
+        if not os.path.isfile(file_name):
+            results = self.get_car_information()
+            self.store_data_in_file(results, f"{file_name}")
+        else:
+            prev_results = self.load_data_from_file(f"{file_name}")
+            new_results = self.get_car_information()
+            if new_results != prev_results:
+                self.identify_change()
 
     """
         This function grabs all makes and models from the dropdown menus
@@ -178,9 +186,11 @@ class PickNPull:
 
             results[location] = vehicles
         driver.quit()
+        return results
 
-    def identify_change(self):
-        print("Found Change")
+    def identify_change(self, new_results, old_results):
+        for key in old_results:
+            print("Testing")
 
     def remove_modal(self, driver):
         try:
