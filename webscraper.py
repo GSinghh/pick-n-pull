@@ -26,10 +26,9 @@ class PickNPull:
         self.model = model
         self.models = {}
         self.makes = {}
-        self.allCars = {}
 
         options = Options()
-        # options.add_argument("--headless=new")
+        options.add_argument("--headless=new")
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(
@@ -132,6 +131,7 @@ class PickNPull:
             return self.start_year + "-" + self.end_year
 
     def get_car_information(self):
+        results = {}
         driver = self.driver
         driver.get(self.URL_builder())
         self.remove_modal(driver)
@@ -176,7 +176,7 @@ class PickNPull:
                 except Exception as e:
                     print(f"Error processing row: {e}")
 
-            self.allCars[location] = vehicles
+            results[location] = vehicles
         driver.quit()
 
     def identify_change(self):
