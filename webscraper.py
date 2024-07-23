@@ -11,7 +11,7 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import os
 import json
-import dotenv
+from datetime import datetime
 
 
 class PickNPull:
@@ -41,15 +41,17 @@ class PickNPull:
         else:
             self.get_makes_and_models()
 
-        file_name = f"{self.make}_{self.model}.json"
-        if not os.path.isfile(file_name):
-            results = self.get_car_information()
-            self.store_data_in_file(results, f"{file_name}")
-        else:
-            prev_results = self.load_data_from_file(f"{file_name}")
-            new_results = self.get_car_information()
-            if new_results != prev_results:
-                self.identify_change()
+        # file_name = f"{self.make}_{self.model}.json"
+        # if not os.path.isfile(file_name):
+        #     results = self.get_car_information()
+        #     self.store_data_in_file(results, f"{file_name}")
+        # else:
+        #     prev_results = self.load_data_from_file(f"{file_name}")
+        #     new_results = self.get_car_information()
+        #     if new_results != prev_results:
+        #         self.identify_change(new_results, prev_results)
+        results = self.get_car_information()
+        print(results)
 
     """
         This function grabs all makes and models from the dropdown menus
@@ -171,13 +173,14 @@ class PickNPull:
                     image_url = row.find_element(By.XPATH, "./td[1]/img").get_attribute(
                         "src"
                     )
-
+                    set_date = row.find_element(By.XPATH, "./td[6]").text
                     vehicle = f"{year} {make} {model}"
                     vehicles.append(
                         {
                             "Car": vehicle,
                             "Row Number": row_number,
                             "Image URL": image_url,
+                            "Set Date": set_date,
                         }
                     )
 
@@ -186,11 +189,25 @@ class PickNPull:
 
             results[location] = vehicles
         driver.quit()
-        return results
+        date_format = "%m/%d/%Y"
+        sorted_results = {
+            location: sorted(
+                cars,
+                key=lambda x: datetime.strptime(x["Set Date"], date_format),
+                reverse=True,
+            )
+            for location, cars in results.items()
+        }
+        return sorted_results
 
-    def identify_change(self, new_results, old_results):
-        for key in old_results:
-            print("Testing")
+    def identify_change(self, new_results, prev_results):
+        # This function will identify change between the previous results and the current results after scraping
+
+        for key in new_results:
+            if key not in prev_results:
+                print("Car added at new location")
+            elif len(prev_results[key]) < len(new_results[key]):
+                print("A vehicle has been added to inventory")
 
     def remove_modal(self, driver):
         try:
