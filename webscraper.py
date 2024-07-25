@@ -12,6 +12,7 @@ import time
 import os
 import json
 from datetime import datetime
+from collections import defaultdict
 
 
 class PickNPull:
@@ -202,12 +203,20 @@ class PickNPull:
 
     def identify_change(self, new_results, prev_results):
         # This function will identify change between the previous results and the current results after scraping
+        # It will return a dictionary with the locations of the changes and the vehicles that have changed
+        changes = {}
 
         for key in new_results:
             if key not in prev_results:
-                print("Car added at new location")
-            elif len(prev_results[key]) < len(new_results[key]):
-                print("A vehicle has been added to inventory")
+                changes[key] = new_results[key]
+            elif len(new_results[key]) > len(prev_results[key]):
+                new_cars = [
+                    car for car in new_results[key] if car not in prev_results[key]
+                ]
+                if new_cars:
+                    changes[key] = new_cars
+
+        return changes
 
     def remove_modal(self, driver):
         try:
