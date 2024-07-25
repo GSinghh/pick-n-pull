@@ -12,7 +12,6 @@ import time
 import os
 import json
 from datetime import datetime
-from collections import defaultdict
 
 
 class PickNPull:
@@ -42,17 +41,15 @@ class PickNPull:
         else:
             self.get_makes_and_models()
 
-        # file_name = f"{self.make}_{self.model}.json"
-        # if not os.path.isfile(file_name):
-        #     results = self.get_car_information()
-        #     self.store_data_in_file(results, f"{file_name}")
-        # else:
-        #     prev_results = self.load_data_from_file(f"{file_name}")
-        #     new_results = self.get_car_information()
-        #     if new_results != prev_results:
-        #         self.identify_change(new_results, prev_results)
-        results = self.get_car_information()
-        print(results)
+        file_name = f"{self.make}_{self.model}.json"
+        if not os.path.isfile(file_name):
+            results = self.get_car_information()
+            self.store_data_in_file(results, f"{file_name}")
+        else:
+            prev_results = self.load_data_from_file(f"{file_name}")
+            new_results = self.get_car_information()
+            if new_results != prev_results:
+                new_vehicles = self.identify_change(new_results, prev_results)
 
     """
         This function grabs all makes and models from the dropdown menus
@@ -190,6 +187,7 @@ class PickNPull:
 
             results[location] = vehicles
         driver.quit()
+
         date_format = "%m/%d/%Y"
         sorted_results = {
             location: sorted(
@@ -203,7 +201,7 @@ class PickNPull:
 
     def identify_change(self, new_results, prev_results):
         # This function will identify change between the previous results and the current results after scraping
-        # It will return a dictionary with the locations of the changes and the vehicles that have changed
+        # It will return a dictionary with the new vehicles and their locations
         changes = {}
 
         for key in new_results:
