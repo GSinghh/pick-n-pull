@@ -12,6 +12,7 @@ import time
 import os
 import json
 from datetime import datetime
+import email_smtp
 
 
 class PickNPull:
@@ -50,6 +51,7 @@ class PickNPull:
             new_results = self.get_car_information()
             if new_results != prev_results:
                 new_vehicles = self.identify_change(new_results, prev_results)
+                email_smtp.send_email(new_vehicles)
 
     """
         This function grabs all makes and models from the dropdown menus
