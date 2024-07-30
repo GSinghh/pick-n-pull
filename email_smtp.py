@@ -7,10 +7,11 @@ load_dotenv()
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-HOST = os.getenv("HOST")
-PORT_NUMBER = os.getenv("PORT_NUMBER")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER")
 CARRIER = os.getenv("CARRIER")
+
+HOST = "smtp.gmail.com"
+PORT_NUMBER = 587
 
 SMS_CARRIERS = {
     "AT&T": "@txt.att.net",
