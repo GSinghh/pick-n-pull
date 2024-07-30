@@ -10,10 +10,20 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 HOST = os.getenv("HOST")
 PORT_NUMBER = os.getenv("PORT_NUMBER")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER")
+CARRIER = os.getenv("CARRIER")
+
+SMS_CARRIERS = {
+    "AT&T": "@txt.att.net",
+    "Sprint": "@messaging.sprintpcs.com",
+    "T-Mobile": "@tmomail.net",
+    "Verizon": "@vtext.com",
+    "Metro PCS": "@mymetropcs.com",
+}
 
 
 def send_email(new_vehicles):
-    msg = set_message_content(new_vehicles)
+    msg_sms = create_message(new_vehicles, PHONE_NUMBER, CARRIER)
+    msg_email = create_message(new_vehicles, EMAIL_ADDRESS, None)
     with smtplib.SMTP(HOST, PORT_NUMBER) as smtp:
         smtp.ehlo()
         smtp.starttls()
@@ -21,24 +31,29 @@ def send_email(new_vehicles):
 
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
-        smtp.send_message(msg)
+        smtp.send_message(msg_sms)
+        smtp.send_message(msg_email)
         smtp.close()
 
 
-def set_message_content(
-    new_vehicles,
-) -> EmailMessage:
+def create_message(new_vehicles, recipient, carrier) -> EmailMessage:
+
     msg = EmailMessage()
-    msg["To"] = EMAIL_ADDRESS
+    msg["To"] = (
+        EMAIL_ADDRESS if carrier is None else f"{recipient}{SMS_CARRIERS[CARRIER]}"
+    )
     msg["From"] = EMAIL_ADDRESS
     msg["Subject"] = "New Posting('s)!"
+    msg.set_content(format_content(new_vehicles))
 
+    return msg
+
+
+def format_content(new_vehicles):
     msg_content = ""
     for key in new_vehicles:
-        msg_content = f"\nLocation: {key}\n"
+        msg_content += f"\nLocation: {key}\n\n"
         for car in new_vehicles[key]:
             msg_content += f'Vehicle: {car["Car"]}\nRow Number: {car["Row Number"]}\nURL: {car["Image URL"]}\nDate Vehicle was Set: {car["Set Date"]}\n\n'
 
-    msg.set_content(msg_content)
-
-    return msg
+    return msg_content
