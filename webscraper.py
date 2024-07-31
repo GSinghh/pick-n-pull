@@ -179,7 +179,6 @@ class PickNPull:
                         {
                             "Car": vehicle,
                             "Row Number": row_number,
-                            "Image URL": image_url,
                             "Set Date": set_date,
                         }
                     )
