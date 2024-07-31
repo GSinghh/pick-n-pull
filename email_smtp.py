@@ -55,6 +55,6 @@ def format_content(new_vehicles):
     for key in new_vehicles:
         msg_content += f"\nLocation: {key}\n\n"
         for car in new_vehicles[key]:
-            msg_content += f'Vehicle: {car["Car"]}\nRow Number: {car["Row Number"]}\nURL: {car["Image URL"]}\nDate Vehicle was Set: {car["Set Date"]}\n\n'
+            msg_content += f'Vehicle: {car["Car"]}\nRow Number: {car["Row Number"]}\nDate Vehicle was Set: {car["Set Date"]}\n\n'
 
     return msg_content
