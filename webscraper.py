@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 import email_smtp
 import requests
+import cleanse_data
 
 
 class PickNPull:
@@ -45,7 +46,7 @@ class PickNPull:
         if self.model not in models:
             return "Brand Not Found"
 
-        return f"https://www.picknpull.com/api/vehicle/search?&makeId={self.makes[self.make]}&modelId={self.models[self.model]}&year={self.check_years()}&distance={self.distance}&zip={self.postal_code}&language=english"
+        return f"https://www.picknpull.com/api/vehicle/search?&makeId={makes[self.make]}&modelId={models[self.model]}&year={self.check_years()}&distance={self.distance}&zip={self.postal_code}&language=english"
 
     def store_data_in_file(self, data, filename):
         with open(filename, "w") as file:
@@ -60,12 +61,19 @@ class PickNPull:
             return ""
         elif self.start_year != "" and self.end_year == "":
             return self.start_year
+        elif self.start_year == "" and self.end_year != "":
+            return self.end_year
         else:
             return self.start_year + "-" + self.end_year
 
     def get_car_information(self):
-        raw_data = requests.get(self.URL_builder())
-        print(raw_data)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
+        }
+        response = requests.get(self.URL_builder(), headers)
+        data = response.json()
+        json_data = data[0]
+        print(json_data)
 
     def identify_change(self, new_results, prev_results):
         # This function will identify change between the previous results and the current results after scraping
