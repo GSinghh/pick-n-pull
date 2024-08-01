@@ -1,6 +1,3 @@
-import json
-
-
 def parse_json_data(locations):
     vals = {}
     for data in locations:
