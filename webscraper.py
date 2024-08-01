@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 import email_smtp
 import requests
-import cleanse_data
 
 
 class PickNPull:
@@ -63,7 +62,36 @@ class PickNPull:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
         }
         response = requests.get(self.URL_builder(), headers).json()
-        return cleanse_data.parse_json_data(response)
+        return self.parse_json_data(response)
+
+    def parse_json_data(self, locations):
+        vals = {}
+        for data in locations:
+            location = data["location"].get("name", "Name Not Found")
+            vehicles = data["vehicles"]
+            vehicle_info = []
+            for vehicle in vehicles:
+                vin = vehicle.get("vin", "Unknown VIN")
+                link = (
+                    f"https://www.picknpull.com/check-inventory/vehicle-details/{vin}"
+                )
+                year = vehicle.get("year", "Unknown Year")
+                model = vehicle.get("model", "Unknown Model")
+                make = vehicle.get("make", "Unknown Make")
+                row = vehicle.get("row", "Unknown Row")
+                image_url = vehicle.get("largeImage", "Image URL Unavailable")
+                car = f"{year} {make} {model}"
+                vehicle_info.append(
+                    {
+                        "Car": car,
+                        "VIN": vin,
+                        "Row": row,
+                        "Link": link,
+                        "Image URL": image_url,
+                    }
+                )
+            vals[location] = vehicle_info
+        return vals
 
     def identify_change(self, new_results, prev_results):
         changes = {}
