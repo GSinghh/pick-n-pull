@@ -19,25 +19,17 @@ class PickNPull:
 
         file_name = f"{self.make}_{self.model}.json"
         if not os.path.isfile(file_name):
-            results = self.get_car_information()
+            results = self.get_vehicle_information()
             self.store_data_in_file(results, file_name)
         else:
             prev_results = self.load_data_from_file(file_name)
-            new_results = self.get_car_information()
+            new_results = self.get_vehicle_information()
             if new_results != prev_results:
                 new_vehicles = self.identify_change(new_results, prev_results)
                 email_smtp.send_email(new_vehicles)
                 self.store_data_in_file(new_results, file_name)
 
-    """
-        This function grabs all makes and models from the dropdown menus
-        Values are stored in the dictionary
-        Dictionary is saved into json document so dropdowns will only 
-        Need to be parsed once
-    """
-
     def URL_builder(self):
-
         makes = self.load_data_from_file("makes.json")
         models = self.load_data_from_file("models.json")
 
@@ -46,17 +38,17 @@ class PickNPull:
         if self.model not in models:
             return "Brand Not Found"
 
-        return f"https://www.picknpull.com/api/vehicle/search?&makeId={makes[self.make]}&modelId={models[self.model]}&year={self.check_years()}&distance={self.distance}&zip={self.postal_code}&language=english"
+        return f"https://www.picknpull.com/api/vehicle/search?&makeId={makes[self.make]}&modelId={models[self.model]}&year={self.validate_years()}&distance={self.distance}&zip={self.postal_code}&language=english"
 
     def store_data_in_file(self, data, filename):
         with open(filename, "w") as file:
-            json.dump(data, file)
+            json.dump(data, file, indent=4)
 
     def load_data_from_file(self, filename):
         with open(filename) as file:
             return json.load(file)
 
-    def check_years(self):
+    def validate_years(self):
         if self.start_year == "" and self.end_year == "":
             return ""
         elif self.start_year != "" and self.end_year == "":
@@ -64,20 +56,16 @@ class PickNPull:
         elif self.start_year == "" and self.end_year != "":
             return self.end_year
         else:
-            return self.start_year + "-" + self.end_year
+            return f"{self.start_year}-{self.end_year}"
 
-    def get_car_information(self):
+    def get_vehicle_information(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
         }
-        response = requests.get(self.URL_builder(), headers)
-        data = response.json()
-        json_data = data[0]
-        print(json_data)
+        response = requests.get(self.URL_builder(), headers).json()
+        return cleanse_data.parse_json_data(response)
 
     def identify_change(self, new_results, prev_results):
-        # This function will identify change between the previous results and the current results after scraping
-        # It will return a dictionary with the new vehicles and their locations
         changes = {}
 
         for key in new_results:
@@ -89,7 +77,6 @@ class PickNPull:
                 ]
                 if new_cars:
                     changes[key] = new_cars
-
         return changes
 
 
