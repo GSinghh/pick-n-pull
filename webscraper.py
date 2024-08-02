@@ -106,6 +106,3 @@ class PickNPull:
                 if new_cars:
                     changes[key] = new_cars
         return changes
-
-
-test = PickNPull("Acura", "Integra", 94560, 50, "94", "01")
