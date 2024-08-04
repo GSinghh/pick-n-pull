@@ -2,6 +2,7 @@ import os
 import json
 import email_smtp
 import requests
+from datetime import datetime
 
 
 class PickNPull:
@@ -71,7 +72,7 @@ class PickNPull:
             vehicle_info = []
             for vehicle in vehicles:
                 vin = vehicle.get("vin", "Unknown VIN")
-                link = (
+                link_to_post = (
                     f"https://www.picknpull.com/check-inventory/vehicle-details/{vin}"
                 )
                 year = vehicle.get("year", "Unknown Year")
@@ -79,18 +80,27 @@ class PickNPull:
                 make = vehicle.get("make", "Unknown Make")
                 row = vehicle.get("row", "Unknown Row")
                 image_url = vehicle.get("largeImage", "Image URL Unavailable")
+                date_added = vehicle.get("dateAdded", "Date Not Found")
+                if date_added:
+                    date_added = self.format_date(date_added)
                 car = f"{year} {make} {model}"
                 vehicle_info.append(
                     {
                         "Car": car,
                         "VIN": vin,
                         "Row": row,
-                        "Link": link,
+                        "Link": link_to_post,
                         "Image URL": image_url,
+                        "Date Added": date_added,
                     }
                 )
+            vehicle_info.sort(key=lambda vehicle: vehicle.get("Date Added"))
             vals[location] = vehicle_info
         return vals
+
+    def format_date(self, date):
+        date_vals = datetime.fromisoformat(date)
+        return f"{date_vals.month}-{date_vals.day}-{date_vals.year}"
 
     def identify_change(self, new_results, prev_results):
         changes = {}
