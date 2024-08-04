@@ -1,6 +1,5 @@
 import os
 import json
-from datetime import datetime
 import email_smtp
 import requests
 
