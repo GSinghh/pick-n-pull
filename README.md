@@ -25,9 +25,9 @@ MIT
 -   **webscraper.py**: The main script which fetches vehicle information and stores it in a JSON file. It also identifies new vehicles and triggers email and SMS notifications.
 -   **email_smtp.py**: A helper script to send email and SMS notifications using SMTP.
 
-## Usage
+## Setup
 
-To use the PickNPull Notification System, follow these steps:
+To setup the PickNPull Notification System, follow these steps:
 
 1. Clone the repository:
 
@@ -77,3 +77,41 @@ To use the PickNPull Notification System, follow these steps:
     ```sh
     python webscraper.py
     ```
+
+## Usage
+
+### Set Up a Cron Job
+
+To automate the execution of the `webscraper.py` script at regular intervals, you can set up a cron job if you are on a unix based machine. This is useful for running the script periodically without manual intervention.
+
+### 1. Add a _shebang_ line at the top of your python file to specify the interpreter:
+
+```python
+#!/usr/local/bin/python3
+```
+
+### 2. Open Crontab
+
+Open the crontab configuration file for editing by using:
+
+```sh
+crontab -e
+```
+
+### 3. Create a Cron Job Entry
+
+```sh
+0 * * * * /path/to/command /path/to/file
+```
+
+-   This Cron Job will run every hour
+-   Replace `/path/to/command` with the path to your python interpreter
+-   Replace `/path/to/file` with the path to your python file
+
+### 4. Save & Exit, Verify Cron Job
+
+-   To verify that the cron job has been added, you can list current cron jobs with:
+
+```sh
+crontab -l
+```
