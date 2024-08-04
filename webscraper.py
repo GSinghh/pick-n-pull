@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3
+
 import os
 import json
 import email_smtp
@@ -94,7 +96,9 @@ class PickNPull:
                         "Date Added": date_added,
                     }
                 )
-            vehicle_info.sort(key=lambda vehicle: vehicle.get("Date Added"))
+            vehicle_info.sort(
+                key=lambda vehicle: vehicle.get("Date Added"), reverse=True
+            )
             vals[location] = vehicle_info
         return vals
 
