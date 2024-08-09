@@ -23,8 +23,8 @@ class PickNPull:
         else:
             prev_results = self.load_data_from_file(file_name)
             new_results = self.get_vehicle_information()
-            if new_results != prev_results:
-                new_vehicles = self.identify_change(new_results, prev_results)
+            new_vehicles = self.identify_change(new_results, prev_results)
+            if new_vehicles:
                 email_smtp.send_email(new_vehicles)
                 self.store_data_in_file(new_results, file_name)
 
@@ -94,9 +94,7 @@ class PickNPull:
                         "Date Added": date_added,
                     }
                 )
-            vehicle_info.sort(
-                key=lambda vehicle: vehicle.get("Date Added"), reverse=True
-            )
+            vehicle_info.sort(key=lambda vehicle: vehicle.get("VIN"))
             vals[location] = vehicle_info
         return vals
 
@@ -108,11 +106,15 @@ class PickNPull:
         changes = {}
 
         for key in new_results:
+            # Handles case for new location
             if key not in prev_results:
                 changes[key] = new_results[key]
-            elif len(new_results[key]) > len(prev_results[key]):
+            # Handles case for new vehicles
+            else:
                 new_cars = [
-                    car for car in new_results[key] if car not in prev_results[key]
+                    vehicle
+                    for vehicle in new_results[key]
+                    if vehicle not in prev_results[key]
                 ]
                 if new_cars:
                     changes[key] = new_cars
